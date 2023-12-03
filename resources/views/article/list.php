@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>artikel</title>
+    <title>artikel</title>
 </head>
+
 <body>
-<a href="<?= route('article.create') ?>">Tambah artikel</a>
-<?php foreach($articles as $article): ?>
-<div>
-<h4><?= $article['title'] ?></h4>
-<?= $article['content'] ?>
-<div>
-<small><?= $article['date'] ?></small>
-</div>
-</div>
-<hr/>
-<?php endforeach ?>
+    <a href="<?= route('article.create') ?>">Tambah artikel</a>
+    <?php foreach ($articles as $article): ?>
+        <div>
+            <h4>
+                <?= $article['title'] ?>
+            </h4>
+            <?= $article['content'] ?>
+            <div>
+                <small>
+                    <?= $article['date'] ?>
+                </small>
+            </div>
+        </div>
+        <hr />
+    <?php endforeach ?>
 </body>
+
 </html>
