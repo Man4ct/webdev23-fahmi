@@ -22,18 +22,6 @@
             @foreach ($articles as $article)
                 <div class="card mt-3">
                     <div class="card-body">
-                        <h5 class="card-title">{{ $article['title'] }}</h5>
-                        <h6 class="card-subtitle mb-2 text-body-secondary">{{ $article['date'] }}</h6>
-                        <p class="card-text">
-                            {{ $article['content'] }}
-                        </p>
-                    </div>
-                </div>
-            @endforeach
-
-            @foreach ($articles as $article)
-                <div class="card mt-3">
-                    <div class="card-body">
                         <a href="{{ route('article.single', ['slug' => $article->slug]) }}">
                             <h5 class="card-title">{{ $article->title }}</h5>
                         </a>
