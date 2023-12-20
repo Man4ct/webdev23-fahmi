@@ -30,7 +30,7 @@ Route::controller(\App\Http\Controllers\ArticleController::class)->group(functio
     Route::match(['get', 'post'], '/articles/{id}/edit',
 'edit')->name('article.edit');
 Route::post('/articles/{id}/delete', 'delete')->name('article.delete');
-
+Route::post('/articles/{id}/comment', 'comment')->name('article.comment');
 // Route for listing article categories
 Route::get('/article_categories', [ArticleCategoryController::class, 'index'])
     ->name('article_category.list');

@@ -28,6 +28,15 @@
                 <x-form.group for="content" label="Isi">
                     <textarea name="content" id="content" class="form-control" required>{{ old('content') ?? ($article->content ?? '') }}</textarea>
                 </x-form.group>
+                <x-form.group for="article_category_id" label="Kategori">
+                    <select class="form-select" name="article_category_id" id="article_category_id" required>
+                        @foreach ($article_categories as $category)
+                            <option value="{{ $category->id }}" @selected($category->id == (old('article_category_id') ?? ($article->article_category_id ?? '')))>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </x-form.group>
                 <div class="mb-3">
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
