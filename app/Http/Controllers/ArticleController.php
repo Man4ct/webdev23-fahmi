@@ -6,6 +6,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ArticleComment;
 use App\Models\ArticleCategory;
+use Illuminate\Validation\Rule;
+
 class ArticleController extends Controller
 {
     function list(Request $request)
@@ -22,8 +24,20 @@ class ArticleController extends Controller
         $article_categories = ArticleCategory::orderBy('name')->get();
 
         if ($request->isMethod('post')) {
+            $request->validate([
+                'title' => ['required', 'string', 'max:255',
+                    Rule::unique('articles')
+                ],
+                'content' => ['required', 'string', 'max:2000'],
+                'article_category_id' => ['required', 'integer',
+                    Rule::in($article_categories->pluck('id'))]
+            ]);
+            $slug = Str::slug($request->title);
+            if (Article::where('slug', $slug)->exists())
+                $slug .= '-' . uniqid();
+
             $article = Article::create([
-                'slug' => Str::slug($request->title),
+                'slug' => $slug,
                 'title' => $request->title,
                 'content' => $request->content,
                 'article_category_id' => $request->article_category_id,
@@ -53,7 +67,19 @@ class ArticleController extends Controller
         $article = Article::where('id', $id)->first();
         if (!$article)
             return abort(404);
+
+        $articleCategories = ArticleCategory::orderBy('name')->get();
         if ($request->isMethod('post')) {
+            $request->validate([
+                'slug' => ['required', 'string',
+                    Rule::unique('articles')->ignore($article->id)],
+                'title' => ['required', 'string', 'max:255',
+                    Rule::unique('articles')->ignore($article->id)],
+                'content' => ['required', 'string', 'max:2000'],
+                'article_category_id' => ['required', 'integer',
+                    Rule::in($articleCategories->pluck('id'))]
+            ]);
+
             $article->slug = $request->slug;
             $article->title = $request->title;
             $article->content = $request->content;
@@ -71,7 +97,7 @@ class ArticleController extends Controller
         }
         return view('article.form', [
             'article' => $article,
-            'article_categories' => ArticleCategory::orderBy('name')->get()
+            'article_categories' => $articleCategories
         ]);
     }
     function delete(string $id, Request $request)
@@ -93,6 +119,9 @@ class ArticleController extends Controller
         $article = Article::where('id', $id)->first();
         if (!$article)
             return abort(404);
+        $request->validate([
+            'comment' => ['required', 'string', 'max:2000'],
+        ]);
         $comment = ArticleComment::create([
             'article_id' => $article->id,
             'content' => $request->comment
