@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleCategoryController;
+use App\Http\Middleware\EnsureArticleCategoryExists;
+use App\Enums\UserRoleEnum;
+use App\Http\Middleware\EnsureUserRole;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,37 +23,42 @@ Route::get('/', [
 ])->name('home')
 ;
 Route::controller(\App\Http\Controllers\ArticleController::class)->middleware(
-    'auth'
+    ['auth
+',
+        'has_article_category'
+    ]
 )->group(function () {
     Route::get('/articles', 'list')->name('article.list');
     Route::match(
         ['get', 'post'],
         '/articles/create',
         'create'
-    )->name('article.create');
+    )->name('article.create')->middleware('role:' . UserRoleEnum::Administrator->value . ',' . UserRoleEnum::Author->value);
     Route::get('/articles/{slug}', 'single')->name('article.single');
     Route::match(
         ['get', 'post'],
         '/articles/{id}/edit',
         'edit'
-    )->name('article.edit');
-    Route::post('/articles/{id}/delete', 'delete')->name('article.delete');
+    )->name('article.edit')->middleware('role:' . UserRoleEnum::Administrator->value . ',' . UserRoleEnum::Author->value);
+    Route::post('/articles/{id}/delete', 'delete')->name('article.delete')->middleware('role:' . UserRoleEnum::Administrator->value . ',' . UserRoleEnum::Author->value);
     Route::post('/articles/{id}/comment', 'comment')->name('article.comment');
 
 
 });
-Route::controller(\App\Http\Controllers\ArticleCategoryController::class)->middleware('auth')->group(function () {
+Route::controller(ArticleCategoryController::class)->middleware('auth')->group(function () {
     Route::get('/article_categories', 'list')->name('article_category.list');
     Route::match(
         ['get', 'post'],
         '/article_categories/create',
         'create'
-    )->name('article_category.create');
+    )->name('article_category.create')->middleware('can:isAdmin');
+    // ->middleware('role:' . UserRoleEnum::Administrator->value);
     Route::match(
         ['get', 'post'],
         '/article_categories/{id}/edit',
         'edit'
-    )->name('article_category.edit');
+    )->name('article_category.edit')->middleware('can:isAdmin');
+    // ->middleware('role:' . UserRoleEnum::Administrator->value);
     Route::post(
         '/article_categories/{id}/delete',
         'delete'

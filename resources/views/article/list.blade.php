@@ -14,7 +14,9 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 @if (count($articles) < 10)
+                @canany(['isAdmin', 'isAuthor'])
                     <a class="btn btn-success" href="{{ route('article.create') }}">Tambah Artikel</a>
+                    @endcanany
                 @endif
 
                 <a href="{{ route('article_category.list') }}" class="btn btn-primary">Kategori artikel</a>
