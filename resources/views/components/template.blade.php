@@ -3,14 +3,14 @@
 
 <head>
     <title>WebDev 2023 @isset($title)
-            - {{ $title }}
+        - {{ $title }}
         @endisset
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous">
-    </script>
+        </script>
 </head>
 
 <body>
@@ -30,6 +30,23 @@
                         <a class="nav-link" href="<?= route('article.list') ?>">Artikel</a>
                     </li>
                 </ul>
+                @auth
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ auth()->user()->name }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end ">
+                        <li>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-item">Keluar</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                @else
+                <a href="{{ route('login') }}" class="btn btn-outline-primary">Masuk</a>
+                @endauth
             </div>
         </div>
     </nav>
@@ -45,7 +62,7 @@
         @error('alert')
         <x-alert type="danger">{{ session('errors')->first('alert') }}</x-alert>
         @enderror
-        </div>
+    </div>
     {{ $slot }}
 </body>
 
