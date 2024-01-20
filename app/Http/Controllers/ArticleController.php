@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\User;
+
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ArticleComment;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class ArticleController extends Controller
 {
@@ -62,7 +65,9 @@ class ArticleController extends Controller
                     $article->image = $path;
                     $article->save();
                 }
-
+                $users = User::inRandomOrder()->limit(5)->get();
+                Mail::to($users)
+                    ->send(new \App\Mail\ArticlePosted($article));
                 return redirect()->route('article.list')->withSuccess('Artikel berhasil dibuat');
             }
 
@@ -137,6 +142,10 @@ class ArticleController extends Controller
         $article = Article::where('id', $id)->first();
         if (!$article)
             return abort(404);
+
+        if ($request->has('mailable')) {
+            return new \App\Mail\ArticlePosted($article);
+        }
         $image = $article->image;
         if ($article->delete()) {
             if ($image) {
