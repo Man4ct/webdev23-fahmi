@@ -3,12 +3,12 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use App\Models\ArticleComment;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\ArticleComment;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ArticleCommented extends Notification
+class ArticleCommented extends Notification implements ShouldQueue
 {
     use Queueable;
 

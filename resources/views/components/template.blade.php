@@ -3,14 +3,14 @@
 
 <head>
     <title>WebDev 2023 @isset($title)
-        - {{ $title }}
+            - {{ $title }}
         @endisset
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous">
-        </script>
+    </script>
 </head>
 
 <body>
@@ -47,6 +47,16 @@
                 @else
                 <a href="{{ route('login') }}" class="btn btn-outline-primary">Masuk</a>
                 @endauth
+                @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route('notification.list') ?>">
+                            Notifikasi
+                            @if (auth()->user()->unreadNotifications->isNotEmpty())
+                                <span class="badge text-bg-danger">{{ auth()->user()->unreadNotifications->count() }}</span>
+                            @endif
+                        </a>
+                    </li>
+                @endauth
             </div>
         </div>
     </nav>
@@ -56,11 +66,11 @@
         <x-alert type="danger">Gagal</x-alert>
     </div> --}}
     <div class="container">
-        @if(session('success'))
-        <x-alert type="success">{{ session('success') }}</x-alert>
+        @if (session('success'))
+            <x-alert type="success">{{ session('success') }}</x-alert>
         @endif
         @error('alert')
-        <x-alert type="danger">{{ session('errors')->first('alert') }}</x-alert>
+            <x-alert type="danger">{{ session('errors')->first('alert') }}</x-alert>
         @enderror
     </div>
     {{ $slot }}
