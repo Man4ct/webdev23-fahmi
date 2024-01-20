@@ -105,3 +105,9 @@ Route::post('/logout', [
     \App\Http\Controllers\LoginController::class,
     'logout'
 ])->name('logout')->middleware('auth');
+
+Route::controller(\App\Http\Controllers\NotificationController::class)->middleware('
+auth')->group(function() {
+Route::get('/notification', 'list')->name('notification.list');
+Route::get('/notification/{id}/read', 'read')->name('notification.read');
+});

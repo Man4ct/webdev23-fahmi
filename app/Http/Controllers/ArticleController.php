@@ -8,6 +8,7 @@ use App\Models\ArticleComment;
 use App\Models\ArticleCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 
 class ArticleController extends Controller
 {
@@ -27,12 +28,18 @@ class ArticleController extends Controller
 
         if ($request->isMethod('post')) {
             $request->validate([
-                'title' => ['required', 'string', 'max:255',
+                'title' => [
+                    'required',
+                    'string',
+                    'max:255',
                     Rule::unique('articles')
                 ],
                 'content' => ['required', 'string', 'max:2000'],
-                'article_category_id' => ['required', 'integer',
-                    Rule::in($article_categories->pluck('id'))]
+                'article_category_id' => [
+                    'required',
+                    'integer',
+                    Rule::in($article_categories->pluck('id'))
+                ]
             ]);
             $slug = Str::slug($request->title);
             if (Article::where('slug', $slug)->exists())
@@ -73,13 +80,23 @@ class ArticleController extends Controller
         $articleCategories = ArticleCategory::orderBy('name')->get();
         if ($request->isMethod('post')) {
             $request->validate([
-                'slug' => ['required', 'string',
-                    Rule::unique('articles')->ignore($article->id)],
-                'title' => ['required', 'string', 'max:255',
-                    Rule::unique('articles')->ignore($article->id)],
+                'slug' => [
+                    'required',
+                    'string',
+                    Rule::unique('articles')->ignore($article->id)
+                ],
+                'title' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('articles')->ignore($article->id)
+                ],
                 'content' => ['required', 'string', 'max:2000'],
-                'article_category_id' => ['required', 'integer',
-                    Rule::in($articleCategories->pluck('id'))]
+                'article_category_id' => [
+                    'required',
+                    'integer',
+                    Rule::in($articleCategories->pluck('id'))
+                ]
             ]);
 
             $article->slug = $request->slug;
@@ -88,8 +105,10 @@ class ArticleController extends Controller
             $article->article_category_id = $request->article_category_id;
             $article->save();
             if ($article) {
-                return redirect()->route('article.single', ['slug' =>
-                    $article->slug])
+                return redirect()->route('article.single', [
+                    'slug' =>
+                        $article->slug
+                ])
                     ->withSuccess('Artikel berhasil diubah');
             }
             return back()->withInput()
@@ -130,6 +149,13 @@ class ArticleController extends Controller
             'content' => $request->comment
         ]);
         if ($comment) {
+            // Mengirimkan notifikasi ke semua user dengan role author dan admin
+            $authors = User::where('role', \App\Enums\UserRoleEnum::Author)->get();
+            Notification::send($authors, new
+                \App\Notifications\ArticleCommented($comment));
+            // Mengirimkan notifikasi ke user yang sedang login (penulis komentar)
+            $request->user()->notify(new \App\Notifications\ArticleCommented($comment));
+
             return redirect()->route('article.single', ['slug' => $article->slug])
                 ->withSuccess('Komentar berhasil ditambahkan');
         }
