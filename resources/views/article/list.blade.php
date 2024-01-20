@@ -12,10 +12,17 @@
 
 <body><x-template>
         <div class="container">
+            <form class="mb-3">
+                <div class="input-group">
+                    <input type="text" name="search" id="search" class="form-control"
+                        value="{{ request()->query('search') }}" placeholder="Cari artikel">
+                    <button type="submit" class="btn btn-primary">Terapkan</button>
+                </div>
+            </form>
             <div class="d-flex justify-content-between align-items-center mb-3">
                 @if (count($articles) < 10)
-                @canany(['isAdmin', 'isAuthor'])
-                    <a class="btn btn-success" href="{{ route('article.create') }}">Tambah Artikel</a>
+                    @canany(['isAdmin', 'isAuthor'])
+                        <a class="btn btn-success" href="{{ route('article.create') }}">Tambah Artikel</a>
                     @endcanany
                 @endif
 
@@ -35,17 +42,18 @@
                             {{ $article->category->name }}
                         </div> --}}
                         <div class="mt-3">
-                            @if($article->comments_count > 0)
-                            <div class="mb-2 text-muted">Komentar terakhir</div>
-                            <x-article-comment
-                            :comment="$article->comments->last()"></x-article-comment>
+                            @if ($article->comments_count > 0)
+                                <div class="mb-2 text-muted">Komentar terakhir</div>
+                                <x-article-comment :comment="$article->comments->last()"></x-article-comment>
                             @endif
-                            <a href="{{ route('article.single', ['slug' => $article->slug])
-                            }}#comment">Lihat {{ $article->comments_count }} komentar</a>
-                            </div>
+                            <a href="{{ route('article.single', ['slug' => $article->slug]) }}#comment">Lihat
+                                {{ $article->comments_count }} komentar</a>
+                        </div>
                     </div>
                 </div>
             @endforeach
+
+            {{ $articles->links() }}
         </div>
     </x-template>
 </body>

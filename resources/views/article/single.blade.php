@@ -13,6 +13,9 @@
         </div> --}}
         <h1>{{ $article->title }}</h5>
             <h5 class="mb-2 text-body-secondary">{{ $article->updated_at }}</h6>
+                @if ($article->image)
+                    <img src="{{ asset('storage/' . $article->image) }}">
+                @endif
                 <p>
                     {{ $article->content }}
                 </p>
